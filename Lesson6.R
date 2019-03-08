@@ -63,3 +63,84 @@ summary(diamonds$volume)
 
 ggplot(data = diamonds, aes(x=volume, y=price)) + geom_point()
 
+# Observations of the scatterplot
+# Some outliers, with price and volume not looking to have correlation.
+
+# What's the correlation bewtween price and volume? Exclude diamonds that have a volume
+# of 0 or that are greater than 800
+
+diamondsVolumeFiltered <- subset(diamonds, volume>0 & volume <= 800)
+with(diamondsVolumeFiltered, cor(price, volume))
+
+# Subset the data to exclude diamonds with a volume
+# greater than or equal to 800. Also, exclude diamonds
+# with a volume of 0. Adjust the transparency of the
+# points and add a linear model to the plot. (See the
+# Instructor Notes or look up the documentation of
+# geom_smooth() for more details about smoothers.)
+
+ggplot(data = diamondsVolumeFiltered, aes(x=volume, y=price)) + geom_point(alpha=0.01) +
+  stat_smooth(method = "lm")
+
+
+# Do you think this would be a useful model to estimate
+# the price of diamonds? Why or why not?
+
+# The relationship seems to not be linear, so this won't be useful to estimate the price.
+
+ggplot(data = diamondsVolumeFiltered, aes(x=volume, y=price)) + geom_point(alpha=0.01) +
+  geom_smooth()
+
+# Use the function dplyr package
+# to create a new data frame containing
+# info on diamonds by clarity.
+
+# Name the data frame diamondsByClarity
+# The data frame should contain the following
+# variables in this order.
+#       (1) mean_price
+#       (2) median_price
+#       (3) min_price
+#       (4) max_price
+#       (5) n
+# where n is the number of diamonds in each
+# level of clarity.
+
+library(dplyr)
+
+clarity_groups <- group_by(diamonds, clarity)
+diamondsByClarity <- summarise(clarity_groups,
+                          mean_price = mean(price),
+                          median_price = median(price),
+                          min_price = min(price),
+                          max_price = max(price),
+                          n = n())
+
+diamondsByClarity <- arrange(diamondsByClarity, clarity)
+head(diamondsByClarity)
+
+# We’ve created summary data frames with the mean price
+# by clarity and color. You can run the code in R to
+# verify what data is in the variables diamonds_mp_by_clarity
+# and diamonds_mp_by_color.
+
+# Your task is to write additional code to create two bar plots
+# on one output image using the grid.arrange() function from the package
+# gridExtra.
+
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+
+library(gridExtra)
+
+p1 <- ggplot(data=diamonds_mp_by_clarity, aes(x=clarity, y=mean_price)) + geom_bar(stat = "identity")
+p2 <- ggplot(data=diamonds_mp_by_color, aes(x=color, y=mean_price)) + geom_bar(stat = "identity")
+grid.arrange(p1,p2,ncol=1)
+
+## What to do you think about the results?
+
+## It's weird, but mean price tends to decrease while both clarity and color improve. This
+## trends go against intuition. 
