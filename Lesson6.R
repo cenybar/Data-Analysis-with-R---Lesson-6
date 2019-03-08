@@ -37,3 +37,29 @@ ggplot(data = diamonds, aes(x = depth, y = price)) +
 # Correlation between depth vs price
 
 with(diamonds , cor.test(depth, price))
+
+# Create a scatterplot of price vs carat
+# and omit the top 1% of price and carat
+# values.
+
+?coord_cartesian
+summary(diamonds$carat)
+summary(diamonds$price)
+
+ggplot(data = diamonds, aes(y = price, x= carat)) + geom_point(alpha=0.05) +
+ coord_cartesian(ylim = (c(326, quantile(diamonds$price, .99))), xlim = (c(.2, quantile(diamonds$carat, .99))))
+
+# Create a scatterplot of price vs. volume (x * y * z).
+# This is a very rough approximation for a diamond's volume.
+
+# Create a new variable for volume in the diamonds data frame.
+# This will be useful in a later exercise.
+
+# Don't make any adjustments to the plot just yet.
+
+diamonds$volume <- with(diamonds, x*y*z)
+
+summary(diamonds$volume)
+
+ggplot(data = diamonds, aes(x=volume, y=price)) + geom_point()
+
